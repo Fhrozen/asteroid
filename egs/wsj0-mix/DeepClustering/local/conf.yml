@@ -30,4 +30,4 @@ data:
   train_dir: data/wav8k/min/tr/
   valid_dir: data/wav8k/min/cv/
   n_src: 2
-  sample_rate: 8000
+  sample_rate: 16000

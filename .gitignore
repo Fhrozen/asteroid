@@ -115,3 +115,10 @@ venv.bak/
 /.idea/dictionaries/mparient.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
+
+
+
+wav/*
+egs/**/**/wav
+egs/**/**/data
+egs/tools

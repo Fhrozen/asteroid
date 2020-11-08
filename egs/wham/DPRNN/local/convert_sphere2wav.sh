@@ -7,11 +7,12 @@ wav_dir=tmp
 
 . utils/parse_options.sh || exit 1;
 
-
-echo "Download sph2pipe_v2.5 into egs/tools"
-mkdir -p ../../tools
-wget http://www.openslr.org/resources/3/sph2pipe_v2.5.tar.gz -P ../../tools
-cd ../../tools && tar -xzvf sph2pipe_v2.5.tar.gz && gcc -o sph2pipe_v2.5/sph2pipe sph2pipe_v2.5/*.c -lm && cd -
+if [ ! -d ../../tools/sph2pipe_v2.5 ]; then
+  echo "Download sph2pipe_v2.5 into egs/tools"
+  mkdir -p ../../tools
+  wget http://www.openslr.org/resources/3/sph2pipe_v2.5.tar.gz -P ../../tools
+  cd ../../tools && tar -xzvf sph2pipe_v2.5.tar.gz && gcc -o sph2pipe_v2.5/sph2pipe sph2pipe_v2.5/*.c -lm && cd -
+fi
 
 echo "Convert sphere format to wav format"
 sph2pipe=../../tools/sph2pipe_v2.5/sph2pipe

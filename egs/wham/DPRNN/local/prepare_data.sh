@@ -5,6 +5,9 @@ out_dir=tmp
 python_path=python
 
 . utils/parse_options.sh
+set -e
+set -u
+set -o pipefail
 
 ## Download WHAM noises
 mkdir -p $out_dir
@@ -19,8 +22,8 @@ tar -xzvf $out_dir/wham_scripts.tar.gz -C $out_dir/wham_scripts
 mv $out_dir/wham_scripts.tar.gz $out_dir/wham_scripts
 
 wait
-
-unzip $out_dir/wham_noise.zip $out_dir >> logs/unzip_wham.log
+mkdir -p logs
+unzip -n $out_dir/wham_noise.zip -d $out_dir  >> logs/unzip_wham.log
 
 echo "Run python scripts to create the WHAM mixtures"
 # Requires : Numpy, Scipy, Pandas, and Pysoundfile

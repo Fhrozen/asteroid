@@ -6,14 +6,15 @@ set -o pipefail
 
 # Main storage directory. You'll need disk space to dump the WHAM mixtures and the wsj0 wav
 # files if you start from sphere files.
-storage_dir=
+DATA_DIR=${PWD}/wav
+WSJ_DIR=
 
 # If you start from the sphere files, specify the path to the directory and start from stage 0
-sphere_dir=  # Directory containing sphere files
+  # Directory containing sphere files
 # If you already have wsj0 wav files, specify the path to the directory here and start from stage 1
-wsj0_wav_dir=
+
 # If you already have the WHAM mixtures, specify the path to the directory here and start from stage 2
-wham_wav_dir=
+
 # After running the recipe a first time, you can run it from stage 3 directly to train new models.
 
 # Path to the python you'll use for the experiment. Defaults to the current python
@@ -27,16 +28,16 @@ python_path=python
 stage=3  # Controls from which stage to start
 tag=""  # Controls the directory name associated to the experiment
 # You can ask for several GPUs using id (passed to CUDA_VISIBLE_DEVICES)
-id=$CUDA_VISIBLE_DEVICES
+id=0
 
 # Data
 task=sep_clean  # Specify the task here (sep_clean, sep_noisy, enh_single, enh_both)
-sample_rate=8000
+sample_rate=16000
 mode=min
 nondefault_src=  # If you want to train a network with 3 output streams for example.
 
 # Training
-batch_size=6
+batch_size=3
 num_workers=6
 optimizer=adam
 lr=0.001
@@ -52,7 +53,6 @@ hop_size=50
 # Evaluation
 eval_use_gpu=1
 
-
 . utils/parse_options.sh
 
 sr_string=$(($sample_rate/1000))
@@ -63,14 +63,16 @@ train_dir=$dumpdir/tr
 valid_dir=$dumpdir/cv
 test_dir=$dumpdir/tt
 
+wham_wav_dir=${DATA_DIR}/wham
+
 if [[ $stage -le  0 ]]; then
   echo "Stage 0: Converting sphere files to wav files"
-  . local/convert_sphere2wav.sh --sphere_dir $sphere_dir --wav_dir $wsj0_wav_dir
+  . local/convert_sphere2wav.sh --sphere_dir ${WSJ_DIR} --wav_dir ${DATA_DIR}/wsj0
 fi
 
 if [[ $stage -le  1 ]]; then
 	echo "Stage 1: Generating 8k and 16k WHAM dataset"
-  . local/prepare_data.sh --wav_dir $wsj0_wav_dir --out_dir $wham_wav_dir --python_path $python_path
+  . local/prepare_data.sh --wav_dir ${DATA_DIR} --out_dir ${wham_wav_dir} --python_path $python_path
 fi
 
 if [[ $stage -le  2 ]]; then
@@ -81,7 +83,7 @@ if [[ $stage -le  2 ]]; then
 			tmp_dumpdir=data/wav${sr_string}k/$mode_option
 			echo "Generating json files in $tmp_dumpdir"
 			[[ ! -d $tmp_dumpdir ]] && mkdir -p $tmp_dumpdir
-			local_wham_dir=$wham_wav_dir/wav${sr_string}k/$mode_option/
+			local_wham_dir=${wham_wav_dir}/wav${sr_string}k/$mode_option/
       $python_path local/preprocess_wham.py --in_dir $local_wham_dir --out_dir $tmp_dumpdir
     done
   done

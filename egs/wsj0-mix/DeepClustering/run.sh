@@ -6,14 +6,14 @@ set -o pipefail
 
 # Main storage directory. You'll need disk space to dump the WHAM mixtures and the wsj0 wav
 # files if you start from sphere files.
-storage_dir=
+storage_dir=${PWD}/wav
 # If you start from the sphere files, specify the path to the directory and start from stage 0
-sphere_dir=  # Directory containing sphere files
+sphere_dir=/home/nelson/corpus1/LDC/LDC93S6A  # Directory containing sphere files
 # If you already have wsj0 wav files (converted from sphere format).
-wsj0_wav_dir=
+wsj0_wav_dir=${PWD}/wav/wsj
 # If you already have the wsj0-2mix and wsj0-3mix mixtures, specify the path to the common directory
 # and start from stage 2.
-wsj0mix_wav_dir=
+wsj0mix_wav_dir=${PWD}/wav/wsj_mix
 
 # After running the recipe a first time, you can run it from stage 3 directly to train new models.
 
@@ -51,6 +51,8 @@ eval_use_gpu=1
 
 . utils/parse_options.sh
 
+export PATH="/utils/python3.7/bin:${PATH}"
+
 sr_string=$(($sample_rate/1000))
 suffix=${n_src}speakers/wav${sr_string}k/$mode
 dumpdir=data/$suffix  # directory to put generated json file
@@ -67,7 +69,7 @@ fi
 if [[ $stage -le  1 ]]; then
 	echo "Stage 1 : Downloading wsj0-mix mixing scripts"
 	# Link + WHAM is ok for 2 source.
-	wget https://www.merl.com/demos/deep-clustering/create-speaker-mixtures.zip -O ./local/
+	wget https://www.merl.com/demos/deep-clustering/create-speaker-mixtures.zip -P ./local/
 	unzip ./local/create-speaker-mixtures.zip -d ./local/create-speaker-mixtures
 	mv ./local/create-speaker-mixtures.zip ./local/create-speaker-mixtures
 
