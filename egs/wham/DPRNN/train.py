@@ -21,6 +21,7 @@ from asteroid.losses import PITLossWrapper, pairwise_neg_sisdr
 # By default train.py will use all available GPUs. The `id` option in run.sh
 # will limit the number of available GPUs for train.py .
 parser = argparse.ArgumentParser()
+parser.add_argument("--config-file", default="local/conf.yml", help="")
 parser.add_argument("--exp_dir", default="exp/tmp", help="Full path to save best validation model")
 
 
@@ -55,8 +56,12 @@ def main(conf):
     )
     # Update number of source values (It depends on the task)
     conf["masknet"].update({"n_src": train_set.n_src})
-
-    model = DPRNNTasNet(**conf["filterbank"], **conf["masknet"])
+    if conf["masknet"]["model"] == "DPRNN":
+        model = DPRNNTasNet(**conf["filterbank"], **conf["masknet"])
+    elif conf["masknet"]["model"] == "Conformer":
+        model = Conformer(**conf["filterbank"], **conf["masknet"])
+    else:
+        raise NotImplementedError(f'Unknown type of masknet: {conf["masknet"]["model"]}')
     optimizer = make_optimizer(model.parameters(), **conf["optim"])
     # Define scheduler
     scheduler = None
@@ -124,7 +129,8 @@ if __name__ == "__main__":
     # We start with opening the config file conf.yml as a dictionary from
     # which we can create parsers. Each top level key in the dictionary defined
     # by the YAML file creates a group in the parser.
-    with open("local/conf.yml") as f:
+    args, _ = parser.parse_known_args()
+    with open(args.config_file) as f:
         def_conf = yaml.safe_load(f)
     parser = prepare_parser_from_dict(def_conf, parser=parser)
     # Arguments are then parsed into a hierarchical dictionary (instead of

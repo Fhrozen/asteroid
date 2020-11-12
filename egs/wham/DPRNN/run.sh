@@ -49,6 +49,7 @@ kernel_size=16
 stride=8
 chunk_size=100
 hop_size=50
+train_config=local/dprnn.yml
 
 # Evaluation
 eval_use_gpu=1
@@ -91,10 +92,11 @@ fi
 
 # Generate a random ID for the run if no tag is specified
 uuid=$($python_path -c 'import uuid, sys; print(str(uuid.uuid4())[:8])')
+train_id=$(basename ${train_config%.*})
 if [[ -z ${tag} ]]; then
 	tag=${task}_${sr_string}k${mode}_${uuid}
 fi
-expdir=exp/train_dprnn_${tag}
+expdir=exp/train_${train_id}_${tag}
 mkdir -p $expdir && echo $uuid >> $expdir/run_uuid.txt
 echo "Results from the following experiment will be stored in $expdir"
 
@@ -102,6 +104,7 @@ if [[ $stage -le 3 ]]; then
   echo "Stage 3: Training"
   mkdir -p logs
   CUDA_VISIBLE_DEVICES=$id $python_path train.py \
+		--config-file ${train_config} \
 		--train_dir $train_dir \
 		--valid_dir $valid_dir \
 		--task $task \
