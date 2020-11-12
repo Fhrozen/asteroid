@@ -31,7 +31,7 @@ tag=""  # Controls the directory name associated to the experiment
 id=0
 
 # Data
-task=sep_clean  # Specify the task here (sep_clean, sep_noisy, enh_single, enh_both)
+task=sep_noisy  # Specify the task here (sep_clean, sep_noisy, enh_single, enh_both)
 sample_rate=16000
 mode=min
 nondefault_src=  # If you want to train a network with 3 output streams for example.
