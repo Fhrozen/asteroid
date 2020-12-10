@@ -40,19 +40,11 @@ def main(conf):
         sample_rate=conf["data"]["sample_rate"],
         nondefault_nsrc=conf["data"]["nondefault_nsrc"],
     )
-    ngpus = torch.cuda.device_count()
-    batchsize = conf["training"]["batch_size"]
-    if ngpus > 1:
-        logging.warning(
-            'Found %d gpus. Automatically increase of batchsize %d -> %d',
-            ngpus, batchsize, batchsize * ngpus
-        )
-        batchsize *= ngpus 
     train_loader = DataLoader(
         train_set,
         shuffle=True,
-        batch_size=batchsize,
-        num_workers=batchsize,
+        batch_size=conf["training"]["batch_size"],
+        num_workers=conf["training"]["batch_size"],
         drop_last=True,
     )
     val_loader = DataLoader(
