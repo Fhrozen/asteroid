@@ -120,5 +120,6 @@ venv.bak/
 
 wav/*
 egs/**/**/wav
+egs/**/**/custom*
 egs/**/**/data
 egs/tools

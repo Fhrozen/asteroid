@@ -1,5 +1,6 @@
 # Models
 from .conv_tasnet import ConvTasNet
+from .conformer import Conformer
 from .dccrnet import DCCRNet
 from .dcunet import DCUNet
 from .dprnn_tasnet import DPRNNTasNet
@@ -13,6 +14,7 @@ from .publisher import save_publishable, upload_publishable
 
 __all__ = [
     "ConvTasNet",
+    "Conformer",
     "DPRNNTasNet",
     "SuDORMRFImprovedNet",
     "SuDORMRFNet",

@@ -1,6 +1,10 @@
+import logging
+import numpy as np
+
 from ..filterbanks import make_enc_dec
 
 from .base_models import BaseEncoderMaskerDecoder
+from .conformer_utils.encoder import Encoder
 
 
 class Conformer(BaseEncoderMaskerDecoder):
@@ -12,13 +16,13 @@ class Conformer(BaseEncoderMaskerDecoder):
         n_src,
         out_chan=None,
         n_blocks=8,
-        n_repeats=3,
-        bn_chan=128,
-        hid_chan=512,
-        skip_chan=128,
-        conv_kernel_size=3,
-        norm_type="gLN",
-        mask_act="sigmoid",
+        dropout=0,
+        adim=512,
+        aheads=2,
+        eunits=2048,
+        chunk_size=512,
+        hop_size=128,
+        cnn_module_kernel=31,
         in_chan=None,
         fb_name="free",
         kernel_size=16,
@@ -45,18 +49,29 @@ class Conformer(BaseEncoderMaskerDecoder):
                 f"{n_feats} and {in_chan}"
             )
         # Update in_chan
-        masker = ""
-        # masker = TDConvNet(
-        #     n_feats,
-        #     n_src,
-        #     out_chan=out_chan,
-        #     n_blocks=n_blocks,
-        #     n_repeats=n_repeats,
-        #     bn_chan=bn_chan,
-        #     hid_chan=hid_chan,
-        #     skip_chan=skip_chan,
-        #     conv_kernel_size=conv_kernel_size,
-        #     norm_type=norm_type,
-        #     mask_act=mask_act,
-        # )
+        masker = Encoder(
+            idim=n_feats,
+            n_src=n_src,
+            attention_dim=adim,
+            attention_heads=aheads,
+            linear_units=eunits,
+            num_blocks=n_blocks,
+            input_layer="linear",
+            chunk_size=chunk_size,
+            hop_size=hop_size,
+            dropout_rate=dropout,
+            positional_dropout_rate=dropout,
+            attention_dropout_rate=dropout,
+            pos_enc_layer_type="rel_pos",
+            selfattention_layer_type="rel_selfattn",
+            activation_type="swish",
+            macaron_style=False,
+            use_cnn_module=True,
+            cnn_module_kernel=cnn_module_kernel,
+        )
+        n_params = 0
+        for p in list(masker.parameters()):
+            n_params += np.prod(list(p.size()))
+        logging.info(n_params)
+        logging.info(masker)
         super().__init__(encoder, masker, decoder, encoder_activation=encoder_activation)

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Exit on error
+set -u
 set -e
 set -o pipefail
 
@@ -36,19 +37,6 @@ sample_rate=16000
 mode=min
 nondefault_src=  # If you want to train a network with 3 output streams for example.
 
-# Training
-batch_size=3
-num_workers=6
-optimizer=adam
-lr=0.001
-epochs=200
-weight_decay=0.00001
-
-# Architecture config
-kernel_size=16
-stride=8
-chunk_size=100
-hop_size=50
 train_config=local/dprnn.yml
 
 # Evaluation
@@ -65,6 +53,10 @@ valid_dir=$dumpdir/cv
 test_dir=$dumpdir/tt
 
 wham_wav_dir=${DATA_DIR}/wham
+
+if [ -f custom_envs.sh ]; then
+	source custom_envs.sh
+fi
 
 if [[ $stage -le  0 ]]; then
   echo "Stage 0: Converting sphere files to wav files"
@@ -109,16 +101,6 @@ if [[ $stage -le 3 ]]; then
 		--valid_dir $valid_dir \
 		--task $task \
 		--sample_rate $sample_rate \
-		--lr $lr \
-		--epochs $epochs \
-		--batch_size $batch_size \
-		--num_workers $num_workers \
-		--optimizer $optimizer \
-		--weight_decay $weight_decay \
-		--kernel_size $kernel_size \
-		--stride $stride \
-		--chunk_size $chunk_size \
-		--hop_size $hop_size \
 		--exp_dir ${expdir}/ | tee logs/train_${tag}.log
 	cp logs/train_${tag}.log $expdir/train.log
 

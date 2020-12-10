@@ -1,6 +1,7 @@
 import os
 import argparse
 import json
+import logging
 
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -8,7 +9,7 @@ from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
-from asteroid import DPRNNTasNet
+from asteroid import DPRNNTasNet, Conformer
 from asteroid.data.wham_dataset import WhamDataset
 from asteroid.engine.optimizers import make_optimizer
 from asteroid.engine.system import System
@@ -125,7 +126,10 @@ if __name__ == "__main__":
     import yaml
     from pprint import pprint
     from asteroid.utils import prepare_parser_from_dict, parse_args_as_dict
-
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s (%(module)s:%(lineno)d) %(levelname)s: %(message)s",
+    )
     # We start with opening the config file conf.yml as a dictionary from
     # which we can create parsers. Each top level key in the dictionary defined
     # by the YAML file creates a group in the parser.
