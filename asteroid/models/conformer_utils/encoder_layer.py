@@ -52,9 +52,9 @@ class EncoderLayer(nn.Module):
     ):
         """Construct an EncoderLayer object."""
         super(EncoderLayer, self).__init__()
+        self.feed_forward_macaron = feed_forward_macaron
         self.self_attn = self_attn
         self.feed_forward = feed_forward
-        self.feed_forward_macaron = feed_forward_macaron
         self.conv_module = conv_module
         self.norm_ff = LayerNorm(size)  # for the FNN module
         self.norm_mha = LayerNorm(size)  # for the MHA module

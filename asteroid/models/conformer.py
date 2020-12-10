@@ -17,7 +17,7 @@ class Conformer(BaseEncoderMaskerDecoder):
         out_chan=None,
         n_blocks=8,
         dropout=0,
-        adim=512,
+        adims=512,
         aheads=2,
         eunits=2048,
         chunk_size=512,
@@ -52,7 +52,7 @@ class Conformer(BaseEncoderMaskerDecoder):
         masker = Encoder(
             idim=n_feats,
             n_src=n_src,
-            attention_dim=adim,
+            attention_dim=adims,
             attention_heads=aheads,
             linear_units=eunits,
             num_blocks=n_blocks,
@@ -65,7 +65,7 @@ class Conformer(BaseEncoderMaskerDecoder):
             pos_enc_layer_type="rel_pos",
             selfattention_layer_type="rel_selfattn",
             activation_type="swish",
-            macaron_style=False,
+            macaron_style=True,
             use_cnn_module=True,
             cnn_module_kernel=cnn_module_kernel,
         )
